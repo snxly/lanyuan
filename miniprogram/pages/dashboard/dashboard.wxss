@@ -3,6 +3,7 @@
 .container {
   padding: 20rpx;
   background-color: #f7f7f7;
+  padding-bottom: 140rpx;
 }
 
 /* 页面头部 */
@@ -112,6 +113,12 @@
   color: #ffaa00;
 }
 
+.badge-progress {
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  margin-left: 16rpx;
+}
+
 /* 进度条 */
 .progress-bar {
   height: 12rpx;
@@ -183,7 +190,7 @@
   background: white;
   border-radius: 24rpx;
   padding: 30rpx;
-  margin-bottom: 140rpx;
+  margin-bottom: 30rpx;
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
 }
 

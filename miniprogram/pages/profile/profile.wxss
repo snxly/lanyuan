@@ -3,6 +3,7 @@
 .container {
   padding: 20rpx;
   background-color: #f7f7f7;
+  padding-bottom: 140rpx;
 }
 
 /* 用户信息卡片 */

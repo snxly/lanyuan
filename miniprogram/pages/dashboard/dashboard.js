@@ -64,6 +64,7 @@ Page({
   },
 
   formatDate(dateStr) {
+    if (!dateStr) return ''
     const date = new Date(dateStr)
     const month = date.getMonth() + 1
     const day = date.getDate()
@@ -71,7 +72,29 @@ Page({
   },
 
   isToday(dateStr) {
+    if (!dateStr) return false
     const today = new Date().toISOString().split('T')[0]
     return dateStr.startsWith(today)
+  },
+
+  // 计算进度百分比
+  getProgressPercent() {
+    const households = this.data.dashboardData.totalHouseholds || 0
+    const percent = (households / 2000) * 100
+    return Math.min(percent, 100).toFixed(1)
+  },
+
+  // 计算日增长百分比
+  getDailyGrowthPercent() {
+    const growth = this.data.dashboardData.dailyGrowth || 0
+    const total = this.data.dashboardData.totalHouseholds || 1
+    const percent = (Math.abs(growth) / total) * 100
+    return percent.toFixed(1)
+  },
+
+  viewAllRecords() {
+    wx.switchTab({
+      url: '/pages/records/records'
+    })
   }
 })

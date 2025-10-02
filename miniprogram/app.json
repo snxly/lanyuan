@@ -4,14 +4,8 @@
     "pages/records/records",
     "pages/profile/profile"
   ],
-  "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#07c160",
-    "navigationBarTitleText": "供暖缴费数据看板",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#f7f7f7"
-  },
   "tabBar": {
+    "custom": true,
     "color": "#999",
     "selectedColor": "#07c160",
     "backgroundColor": "#ffffff",
@@ -19,23 +13,30 @@
     "list": [
       {
         "pagePath": "pages/dashboard/dashboard",
-        "iconPath": "images/chart-pie.png",
-        "selectedIconPath": "images/chart-pie-active.png",
-        "text": "数据"
+        "text": "数据",
+        "iconPath": "images/tab-chart.png",
+        "selectedIconPath": "images/tab-chart-active.png"
       },
       {
         "pagePath": "pages/records/records",
-        "iconPath": "images/list.png",
-        "selectedIconPath": "images/list-active.png",
-        "text": "记录"
+        "text": "记录",
+        "iconPath": "images/tab-list.png",
+        "selectedIconPath": "images/tab-list-active.png"
       },
       {
         "pagePath": "pages/profile/profile",
-        "iconPath": "images/user.png",
-        "selectedIconPath": "images/user-active.png",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "images/tab-user.png",
+        "selectedIconPath": "images/tab-user-active.png"
       }
     ]
+  },
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#07c160",
+    "navigationBarTitleText": "供暖缴费数据看板",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f7f7f7"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"

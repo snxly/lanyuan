@@ -22,12 +22,12 @@
       <view class="card-value">{{formatNumber(dashboardData.totalHouseholds)}}户</view>
       <view class="card-target">
         <text>目标: 2,000户</text>
-        <view class="badge" style="background: rgba(255,255,255,0.3); color: #fff; margin-left: 10px;">
-          {{((dashboardData.totalHouseholds / 2000) * 100).toFixed(1)}}%
+        <view class="badge badge-progress">
+          {{getProgressPercent()}}%
         </view>
       </view>
       <view class="progress-bar">
-        <view class="progress-fill" style="width: {{(dashboardData.totalHouseholds / 2000) * 100}}%"></view>
+        <view class="progress-fill" style="width: {{getProgressPercent()}}%"></view>
       </view>
     </view>
 
@@ -39,8 +39,8 @@
       </view>
       <view class="card-value">
         {{dashboardData.dailyGrowth}}户
-        <view class="badge badge-success" wx:if="{{dashboardData.dailyGrowth > 0}}">+{{((dashboardData.dailyGrowth / dashboardData.totalHouseholds) * 100).toFixed(1)}}%</view>
-        <view class="badge badge-warning" wx:else>-{{((Math.abs(dashboardData.dailyGrowth) / dashboardData.totalHouseholds) * 100).toFixed(1)}}%</view>
+        <view class="badge badge-success" wx:if="{{dashboardData.dailyGrowth > 0}}">+{{getDailyGrowthPercent()}}%</view>
+        <view class="badge badge-warning" wx:else>-{{getDailyGrowthPercent()}}%</view>
       </view>
     </view>
 

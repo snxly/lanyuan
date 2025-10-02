@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>缴费数据可视化</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f7f7f7;
+            color: #333;
+            padding: 10px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #07c160, #05a75a);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        
+        .card-primary {
+            background: linear-gradient(135deg, #10aeff, #2d8cf0);
+            color: white;
+            grid-column: span 2;
+        }
+        
+        .card-title {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-primary .card-title {
+            color: rgba(255, 255, 255, 0.85);
+        }
+        
+        .card-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .card-primary .card-value {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        
+        .card-target {
+            font-size: 14px;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-icon {
+            margin-right: 5px;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chart {
+            height: 250px;
+            width: 100%;
+        }
+        
+        .data-table {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 70px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        
+        .table-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .view-all {
+            font-size: 13px;
+            color: #10aeff;
+            font-weight: normal;
+        }
+        
+        .table-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 14px;
+        }
+        
+        .table-row:last-child {
+            border-bottom: none;
+        }
+        
+        .amount {
+            font-weight: 600;
+            color: #07c160;
+            text-align: right;
+        }
+        
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid #eee;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .tab-item.active {
+            color: #07c160;
+        }
+        
+        .tab-icon {
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+        
+        .filter-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+        
+        .filter-btn {
+            background: #f1f1f1;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .filter-icon {
+            margin-left: 5px;
+            font-size: 12px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        
+        .badge-success {
+            background: rgba(7, 193, 96, 0.15);
+            color: #07c160;
+        }
+        
+        .badge-warning {
+            background: rgba(255, 170, 0, 0.15);
+            color: #ffaa00;
+        }
+        
+        .badge-info {
+            background: rgba(16, 174, 255, 0.15);
+            color: #10aeff;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 3px;
+            width: 72%;
+        }
+        
+        .time-badge {
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #f1f1f1;
+            margin-left: 8px;
+        }
+        
+        .today {
+            background: rgba(7, 193, 96, 0.15);
+            color: #07c160;
+        }
+    </style>
+</head>
+<body>
+    <!-- 页面头部 -->
+    <div class="header">
+        <h1>供暖缴费数据看板</h1>
+        <p>实时监控缴费进度与趋势，目标开通供暖需达到2000户</p>
+    </div>
+    
+    <!-- 数据卡片 -->
+    <div class="stats-cards">
+        <div class="card card-primary">
+            <div class="card-title">
+                <i class="fas fa-users card-icon"></i>
+                当前缴费总户数
+            </div>
+            <div class="card-value">1,842户</div>
+            <div class="card-target">
+                <span>目标: 2,000户</span>
+                <span class="badge" style="background: rgba(255,255,255,0.3); color: #fff; margin-left: 10px;">92.1%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-chart-line card-icon"></i>
+                单日增长户数
+            </div>
+            <div class="card-value">126户 <span class="badge badge-success">+8.5%</span></div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-money-bill-wave card-icon"></i>
+                缴费总金额
+            </div>
+            <div class="card-value">¥468万</div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-calendar-day card-icon"></i>
+                缴费最多的一天
+            </div>
+            <div class="card-value">10月15日 <span class="badge badge-success">+208户</span></div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-calendar-minus card-icon"></i>
+                缴费最少的一天
+            </div>
+            <div class="card-value">9月5日 <span class="badge badge-warning">+32户</span></div>
+        </div>
+        
+    </div>
+    
+    <!-- 趋势图1 -->
+    <div class="chart-container">
+        <div class="chart-title">
+            <span>缴费总户数趋势</span>
+            <button class="filter-btn">
+                近90天 <i class="fas fa-chevron-down filter-icon"></i>
+            </button>
+        </div>
+        <div id="totalChart" class="chart"></div>
+    </div>
+    
+    <!-- 趋势图2 -->
+    <div class="chart-container">
+        <div class="chart-title">
+            <span>每日缴费户数趋势</span>
+            <button class="filter-btn">
+                近30天 <i class="fas fa-chevron-down filter-icon"></i>
+            </button>
+        </div>
+        <div id="dailyChart" class="chart"></div>
+    </div>
+    
+    <!-- 数据列表 -->
+    <div class="data-table">
+        <div class="table-title">
+            <span>最近缴费记录</span>
+            <span class="view-all">查看全部 <i class="fas fa-chevron-right" style="font-size: 10px;"></i></span>
+        </div>
+        <div class="table-header">
+            <div>缴费时间</div>
+            <div>缴费金额</div>
+        </div>
+        <div class="table-row">
+            <div>2023-11-05 14:25 <span class="time-badge today">今天</span></div>
+            <div class="amount">¥2,580</div>
+        </div>
+        <div class="table-row">
+            <div>2023-11-05 13:42 <span class="time-badge today">今天</span></div>
+            <div class="amount">¥2,430</div>
+        </div>
+        <div class="table-row">
+            <div>2023-11-05 12:15 <span class="time-badge today">今天</span></div>
+            <div class="amount">¥2,650</div>
+        </div>
+        <div class="table-row">
+            <div>2023-11-05 11:03 <span class="time-badge today">今天</span></div>
+            <div class="amount">¥2,520</div>
+        </div>
+        <div class="table-row">
+            <div>2023-11-04 16:45</div>
+            <div class="amount">¥2,710</div>
+        </div>
+    </div>
+    
+    <!-- 底部导航 -->
+    <div class="tab-bar">
+        <div class="tab-item active">
+            <i class="fas fa-chart-pie tab-icon"></i>
+            <span>数据</span>
+        </div>
+        <div class="tab-item">
+            <i class="fas fa-list tab-icon"></i>
+            <span>记录</span>
+        </div>
+        <div class="tab-item">
+            <i class="fas fa-user tab-icon"></i>
+            <span>我的</span>
+        </div>
+    </div>
+
+    <script>
+        // 初始化图表
+        document.addEventListener('DOMContentLoaded', function() {
+            // 缴费总户数趋势图
+            const totalChart = echarts.init(document.getElementById('totalChart'));
+            const totalOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: '{b}<br/>总户数: {c}户'
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['8月', '9月', '10月', '11月'],
+                    axisLine: {
+                        lineStyle: {
+                            color: '#ddd'
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: '#f5f5f5'
+                        }
+                    }
+                },
+                series: [{
+                    name: '缴费总户数',
+                    type: 'line',
+                    smooth: true,
+                    lineStyle: {
+                        width: 4,
+                        color: '#07c160'
+                    },
+                    symbol: 'circle',
+                    symbolSize: 8,
+                    itemStyle: {
+                        color: '#07c160',
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    },
+                    areaStyle: {
+                        color: {
+                            type: 'linear',
+                            x: 0,
+                            y: 0,
+                            x2: 0,
+                            y2: 1,
+                            colorStops: [{
+                                offset: 0,
+                                color: 'rgba(7, 193, 96, 0.3)'
+                            }, {
+                                offset: 1,
+                                color: 'rgba(7, 193, 96, 0.05)'
+                            }]
+                        }
+                    },
+                    data: [520, 980, 1520, 1842]
+                }]
+            };
+            totalChart.setOption(totalOption);
+            
+            // 每日缴费户数趋势图
+            const dailyChart = echarts.init(document.getElementById('dailyChart'));
+            const dailyOption = {
+                tooltip: {
+                    trigger: 'axis',
+                    formatter: '{b}<br/>缴费户数: {c}户'
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['10-10', '10-15', '10-20', '10-25', '10-30', '11-05'],
+                    axisLine: {
+                        lineStyle: {
+                            color: '#ddd'
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: '#f5f5f5'
+                        }
+                    }
+                },
+                series: [{
+                    name: '每日缴费户数',
+                    type: 'bar',
+                    barWidth: '40%',
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            {offset: 0, color: '#10aeff'},
+                            {offset: 1, color: '#2d8cf0'}
+                        ]),
+                        borderRadius: [4, 4, 0, 0]
+                    },
+                    data: [85, 208, 134, 156, 98, 126]
+                }]
+            };
+            dailyChart.setOption(dailyOption);
+            
+            // 响应窗口调整
+            window.addEventListener('resize', function() {
+                totalChart.resize();
+                dailyChart.resize();
+            });
+        });
+    </script>
+</body>
+</html>

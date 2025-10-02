@@ -1,9 +1,10 @@
 /* pages/dashboard/dashboard.wxss */
 
 .container {
-  padding: 20rpx;
   background-color: #f7f7f7;
+  padding: 20rpx;
   padding-bottom: 140rpx;
+  box-sizing: border-box;
 }
 
 /* 页面头部 */
@@ -14,6 +15,8 @@
   border-radius: 24rpx;
   margin-bottom: 30rpx;
   box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .header-title {
@@ -41,6 +44,8 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 24rpx;
   margin-bottom: 30rpx;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .card {
@@ -141,6 +146,8 @@
   padding: 30rpx;
   margin-bottom: 30rpx;
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .chart-title {
@@ -192,6 +199,8 @@
   padding: 30rpx;
   margin-bottom: 30rpx;
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .table-title {

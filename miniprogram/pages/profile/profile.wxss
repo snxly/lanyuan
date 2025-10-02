@@ -1,9 +1,10 @@
 /* pages/profile/profile.wxss */
 
 .container {
-  padding: 20rpx;
   background-color: #f7f7f7;
+  padding: 20rpx;
   padding-bottom: 140rpx;
+  box-sizing: border-box;
 }
 
 /* 用户信息卡片 */
@@ -15,6 +16,8 @@
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
   display: flex;
   align-items: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .user-avatar {
@@ -68,6 +71,8 @@
   border-radius: 24rpx;
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
   margin-bottom: 30rpx;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .menu-item {
@@ -107,6 +112,8 @@
   padding: 40rpx;
   color: #999;
   font-size: 26rpx;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .app-version {

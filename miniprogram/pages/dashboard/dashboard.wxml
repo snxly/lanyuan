@@ -1,0 +1,129 @@
+<!--pages/dashboard/dashboard.wxml-->
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="header">
+    <view class="header-title">供暖缴费数据看板</view>
+    <view class="header-subtitle">实时监控缴费进度与趋势，目标开通供暖需达到2000户</view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 数据卡片 -->
+  <view wx:else class="stats-cards">
+    <!-- 当前缴费总户数 -->
+    <view class="card card-primary">
+      <view class="card-title">
+        <text class="card-icon">👥</text>
+        当前缴费总户数
+      </view>
+      <view class="card-value">{{formatNumber(dashboardData.totalHouseholds)}}户</view>
+      <view class="card-target">
+        <text>目标: 2,000户</text>
+        <view class="badge" style="background: rgba(255,255,255,0.3); color: #fff; margin-left: 10px;">
+          {{((dashboardData.totalHouseholds / 2000) * 100).toFixed(1)}}%
+        </view>
+      </view>
+      <view class="progress-bar">
+        <view class="progress-fill" style="width: {{(dashboardData.totalHouseholds / 2000) * 100}}%"></view>
+      </view>
+    </view>
+
+    <!-- 单日增长户数 -->
+    <view class="card">
+      <view class="card-title">
+        <text class="card-icon">📈</text>
+        单日增长户数
+      </view>
+      <view class="card-value">
+        {{dashboardData.dailyGrowth}}户
+        <view class="badge badge-success" wx:if="{{dashboardData.dailyGrowth > 0}}">+{{((dashboardData.dailyGrowth / dashboardData.totalHouseholds) * 100).toFixed(1)}}%</view>
+        <view class="badge badge-warning" wx:else>-{{((Math.abs(dashboardData.dailyGrowth) / dashboardData.totalHouseholds) * 100).toFixed(1)}}%</view>
+      </view>
+    </view>
+
+    <!-- 缴费总金额 -->
+    <view class="card">
+      <view class="card-title">
+        <text class="card-icon">💰</text>
+        缴费总金额
+      </view>
+      <view class="card-value">¥{{formatAmount(dashboardData.totalAmount)}}</view>
+    </view>
+
+    <!-- 缴费最多的一天 -->
+    <view class="card">
+      <view class="card-title">
+        <text class="card-icon">📅</text>
+        缴费最多的一天
+      </view>
+      <view class="card-value">
+        {{formatDate(dashboardData.maxDay.date)}}
+        <view class="badge badge-success">+{{dashboardData.maxDay.count}}户</view>
+      </view>
+    </view>
+
+    <!-- 缴费最少的一天 -->
+    <view class="card">
+      <view class="card-title">
+        <text class="card-icon">📅</text>
+        缴费最少的一天
+      </view>
+      <view class="card-value">
+        {{formatDate(dashboardData.minDay.date)}}
+        <view class="badge badge-warning">+{{dashboardData.minDay.count}}户</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 趋势图1 -->
+  <view class="chart-container">
+    <view class="chart-title">
+      <text>缴费总户数趋势</text>
+      <view class="filter-btn">
+        近90天 <text class="filter-icon">▼</text>
+      </view>
+    </view>
+    <view class="chart-placeholder">
+      <text>趋势图区域</text>
+      <text class="chart-hint">(微信小程序中可使用echarts-for-weixin组件)</text>
+    </view>
+  </view>
+
+  <!-- 趋势图2 -->
+  <view class="chart-container">
+    <view class="chart-title">
+      <text>每日缴费户数趋势</text>
+      <view class="filter-btn">
+        近30天 <text class="filter-icon">▼</text>
+      </view>
+    </view>
+    <view class="chart-placeholder">
+      <text>趋势图区域</text>
+      <text class="chart-hint">(微信小程序中可使用echarts-for-weixin组件)</text>
+    </view>
+  </view>
+
+  <!-- 数据列表 -->
+  <view class="data-table">
+    <view class="table-title">
+      <text>最近缴费记录</text>
+      <view class="view-all" bindtap="viewAllRecords">
+        查看全部 <text class="arrow">›</text>
+      </view>
+    </view>
+    <view class="table-header">
+      <view>缴费时间</view>
+      <view>缴费金额</view>
+    </view>
+    <view wx:for="{{dashboardData.recentPayments}}" wx:key="index" class="table-row">
+      <view>
+        {{item.date}}
+        <view class="time-badge today" wx:if="{{isToday(item.date)}}">今天</view>
+      </view>
+      <view class="amount">¥{{item.amount.toFixed(0)}}</view>
+    </view>
+  </view>
+</view>

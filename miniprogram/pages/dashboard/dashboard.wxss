@@ -1,0 +1,250 @@
+/* pages/dashboard/dashboard.wxss */
+
+.container {
+  padding: 20rpx;
+  background-color: #f7f7f7;
+}
+
+/* 页面头部 */
+.header {
+  background: linear-gradient(135deg, #07c160, #05a75a);
+  color: white;
+  padding: 40rpx;
+  border-radius: 24rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.1);
+}
+
+.header-title {
+  font-size: 40rpx;
+  font-weight: 600;
+  margin-bottom: 10rpx;
+}
+
+.header-subtitle {
+  font-size: 28rpx;
+  opacity: 0.9;
+}
+
+/* 加载状态 */
+.loading {
+  text-align: center;
+  padding: 100rpx;
+  font-size: 32rpx;
+  color: #999;
+}
+
+/* 数据卡片 */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24rpx;
+  margin-bottom: 30rpx;
+}
+
+.card {
+  background: white;
+  border-radius: 24rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.card-primary {
+  background: linear-gradient(135deg, #10aeff, #2d8cf0);
+  color: white;
+  grid-column: span 2;
+}
+
+.card-title {
+  font-size: 26rpx;
+  color: #888;
+  margin-bottom: 16rpx;
+  display: flex;
+  align-items: center;
+}
+
+.card-primary .card-title {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.card-icon {
+  margin-right: 10rpx;
+  font-size: 32rpx;
+}
+
+.card-value {
+  font-size: 48rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+}
+
+.card-primary .card-value {
+  font-size: 64rpx;
+  margin-bottom: 10rpx;
+}
+
+.card-target {
+  font-size: 28rpx;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+/* 徽章 */
+.badge {
+  display: inline-block;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  margin-left: 16rpx;
+}
+
+.badge-success {
+  background: rgba(7, 193, 96, 0.15);
+  color: #07c160;
+}
+
+.badge-warning {
+  background: rgba(255, 170, 0, 0.15);
+  color: #ffaa00;
+}
+
+/* 进度条 */
+.progress-bar {
+  height: 12rpx;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 6rpx;
+  margin-top: 16rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: white;
+  border-radius: 6rpx;
+}
+
+/* 图表容器 */
+.chart-container {
+  background: white;
+  border-radius: 24rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.chart-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 30rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter-btn {
+  background: #f1f1f1;
+  border: none;
+  padding: 12rpx 24rpx;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  display: flex;
+  align-items: center;
+}
+
+.filter-icon {
+  margin-left: 10rpx;
+  font-size: 24rpx;
+}
+
+.chart-placeholder {
+  height: 500rpx;
+  background: #f9f9f9;
+  border-radius: 12rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.chart-hint {
+  font-size: 24rpx;
+  margin-top: 20rpx;
+  color: #ccc;
+}
+
+/* 数据表格 */
+.data-table {
+  background: white;
+  border-radius: 24rpx;
+  padding: 30rpx;
+  margin-bottom: 140rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.table-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 30rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.view-all {
+  font-size: 26rpx;
+  color: #10aeff;
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+}
+
+.arrow {
+  margin-left: 8rpx;
+  font-size: 24rpx;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #eee;
+  font-weight: 600;
+  font-size: 28rpx;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  padding: 24rpx 0;
+  border-bottom: 2rpx solid #f5f5f5;
+  font-size: 28rpx;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.amount {
+  font-weight: 600;
+  color: #07c160;
+  text-align: right;
+}
+
+.time-badge {
+  font-size: 24rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  background: #f1f1f1;
+  margin-left: 16rpx;
+}
+
+.today {
+  background: rgba(7, 193, 96, 0.15);
+  color: #07c160;
+}

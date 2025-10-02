@@ -1,0 +1,52 @@
+<!--pages/profile/profile.wxml-->
+<view class="container">
+  <!-- 用户信息卡片 -->
+  <view class="user-card">
+    <view class="user-avatar">
+      <image wx:if="{{hasUserInfo}}" src="{{userInfo.avatarUrl}}" class="avatar"></image>
+      <view wx:else class="avatar-placeholder">👤</view>
+    </view>
+    <view class="user-info">
+      <view class="user-name">
+        {{hasUserInfo ? userInfo.nickName : '未登录用户'}}
+      </view>
+      <view class="user-desc">蓝苑小区居民</view>
+    </view>
+    <button wx:if="{{!hasUserInfo}}" class="login-btn" bindtap="getUserProfile">
+      登录
+    </button>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-list">
+    <view class="menu-item" bindtap="contactService">
+      <view class="menu-left">
+        <text class="menu-icon">📞</text>
+        <text class="menu-text">联系客服</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+
+    <view class="menu-item" bindtap="aboutApp">
+      <view class="menu-left">
+        <text class="menu-icon">ℹ️</text>
+        <text class="menu-text">关于应用</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+
+    <view class="menu-item">
+      <view class="menu-left">
+        <text class="menu-icon">⚙️</text>
+        <text class="menu-text">设置</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 应用信息 -->
+  <view class="app-info">
+    <text class="app-version">版本 v1.0.0</text>
+    <text class="app-copyright">© 2023 蓝苑小区</text>
+  </view>
+</view>

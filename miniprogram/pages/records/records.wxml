@@ -1,0 +1,36 @@
+<!--pages/records/records.wxml-->
+<view class="container">
+  <!-- 页面头部 -->
+  <view class="header">
+    <view class="header-title">缴费记录</view>
+    <view class="header-subtitle">查看所有缴费记录</view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 数据列表 -->
+  <view wx:else class="records-list">
+    <view class="table-header">
+      <view>缴费时间</view>
+      <view>缴费金额</view>
+    </view>
+    <view wx:for="{{allPayments}}" wx:key="index" class="record-row">
+      <view class="record-time">
+        {{item.date}}
+        <view class="time-badge today" wx:if="{{isToday(item.date)}}">今天</view>
+      </view>
+      <view class="record-amount">¥{{item.amount.toFixed(0)}}</view>
+    </view>
+
+    <!-- 加载更多 -->
+    <view wx:if="{{hasMore}}" class="load-more" bindtap="loadMoreRecords">
+      <text>加载更多</text>
+    </view>
+    <view wx:else class="no-more">
+      <text>没有更多数据了</text>
+    </view>
+  </view>
+</view>

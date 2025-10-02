@@ -26,6 +26,12 @@ let paymentData = {
 // 获取源数据的函数
 async function fetchPaymentData() {
   try {
+    const https = require('https');
+    const agent = new https.Agent({
+      rejectUnauthorized: false,
+      secureOptions: require('constants').SSL_OP_LEGACY_SERVER_CONNECT
+    });
+
     const response = await axios.post(
       'https://open.lsbankchina.com/jfpt/ent/app/api/app/control/getFixedCosts',
       {
@@ -51,13 +57,16 @@ async function fetchPaymentData() {
           'sec-ch-ua': '""',
           'sec-ch-ua-mobile': '?1',
           'sec-ch-ua-platform': '""'
-        }
+        },
+        httpsAgent: agent,
+        timeout: 10000
       }
     );
 
     return response.data.data.showData || [];
   } catch (error) {
     console.error('获取数据失败:', error.message);
+    console.error('错误详情:', error.response?.data || error.code);
     return [];
   }
 }
@@ -179,10 +188,12 @@ app.get('/api/dashboard', (req, res) => {
 });
 
 // 启动时立即获取一次数据
-fetchPaymentData().then(rawData => {
-  paymentData = processData(rawData);
-  console.log('初始数据加载完成');
-});
+setTimeout(() => {
+  fetchPaymentData().then(rawData => {
+    paymentData = processData(rawData);
+    console.log('初始数据加载完成');
+  });
+}, 1000);
 
 app.listen(PORT, () => {
   console.log(`服务器运行在端口 ${PORT}`);

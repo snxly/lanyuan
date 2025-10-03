@@ -12,6 +12,7 @@ app.use(express.json());
 
 // 存储数据
 let paymentData = {
+  targetHouseholds: 0,
   totalHouseholds: 0,
   totalAmount: 0,
   dailyGrowth: 0,
@@ -93,7 +94,8 @@ function processData(rawData) {
     paymentsByDate[date].amount += parseFloat(payment.payAmt);
 
     paymentAmounts.push({
-      date: payment.patTime,
+      // 2024-12-02 10:58:34.0 -> 2024-12-02 10:58:34 
+      date: payment.patTime.replace(/\.0$/, ''),
       amount: parseFloat(payment.payAmt)
     });
   });
@@ -101,7 +103,7 @@ function processData(rawData) {
   // 计算统计数据
   const dates = Object.keys(paymentsByDate).sort();
   const totalHouseholds = rawData.length;
-  const totalAmount = rawData.reduce((sum, payment) => sum + parseFloat(payment.payAmt), 0);
+  const totalAmount = Math.floor(rawData.reduce((sum, payment) => sum + parseFloat(payment.payAmt), 0) / 10000);
 
   // 计算每日增长（最近一天与前一天的比较）
   let dailyGrowth = 0;
@@ -158,15 +160,40 @@ function processData(rawData) {
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 10);
 
+  // 计算进度百分比
+  const targetHouseholds = 606
+  const progressPercent = Math.min((totalHouseholds / targetHouseholds) * 100, 100).toFixed(1);
+
+  // 计算日增长百分比
+  const dailyGrowthPercent = ((Math.abs(dailyGrowth) / totalHouseholds) * 100).toFixed(1);
+
+  // 格式化日期
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${month}.${day}`;
+  };
+
   return {
+    targetHouseholds,
     totalHouseholds,
     totalAmount,
     dailyGrowth,
-    maxDay,
-    minDay,
+    maxDay: {
+      ...maxDay,
+      formattedDate: formatDate(maxDay.date)
+    },
+    minDay: {
+      ...minDay,
+      formattedDate: formatDate(minDay.date)
+    },
     trendData,
     dailyData,
     recentPayments,
+    progressPercent,
+    dailyGrowthPercent,
     lastUpdate: new Date().toISOString()
   };
 }

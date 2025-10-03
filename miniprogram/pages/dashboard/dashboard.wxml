@@ -3,7 +3,7 @@
   <!-- 页面头部 -->
   <view class="header">
     <view class="header-title">供暖缴费数据看板</view>
-    <view class="header-subtitle">实时监控缴费进度与趋势，目标开通供暖需达到2000户</view>
+    <view class="header-subtitle">实时监控缴费进度与趋势</view>
   </view>
 
   <!-- 加载状态 -->
@@ -19,15 +19,15 @@
         <text class="card-icon">👥</text>
         当前缴费总户数
       </view>
-      <view class="card-value">{{formatNumber(dashboardData.totalHouseholds)}}户</view>
+      <view class="card-value">{{dashboardData.totalHouseholds}}户</view>
       <view class="card-target">
-        <text>目标: 2,000户</text>
+        <text>目标: {{dashboardData.targetHouseholds}} 户</text>
         <view class="badge badge-progress">
-          {{getProgressPercent()}}%
+          {{dashboardData.progressPercent}}%
         </view>
       </view>
       <view class="progress-bar">
-        <view class="progress-fill" style="width: {{getProgressPercent()}}%"></view>
+        <view class="progress-fill" style="width: {{dashboardData.progressPercent}}%"></view>
       </view>
     </view>
 
@@ -35,12 +35,12 @@
     <view class="card">
       <view class="card-title">
         <text class="card-icon">📈</text>
-        单日增长户数
+        今日增长户数
       </view>
       <view class="card-value">
         {{dashboardData.dailyGrowth}}户
-        <view class="badge badge-success" wx:if="{{dashboardData.dailyGrowth > 0}}">+{{getDailyGrowthPercent()}}%</view>
-        <view class="badge badge-warning" wx:else>-{{getDailyGrowthPercent()}}%</view>
+        <view class="badge badge-success" wx:if="{{dashboardData.dailyGrowth > 0}}">+{{dashboardData.dailyGrowthPercent}}%</view>
+        <view class="badge badge-warning" wx:else>-{{dashboardData.dailyGrowthPercent}}%</view>
       </view>
     </view>
 
@@ -50,7 +50,7 @@
         <text class="card-icon">💰</text>
         缴费总金额
       </view>
-      <view class="card-value">¥{{formatAmount(dashboardData.totalAmount)}}</view>
+      <view class="card-value">¥{{dashboardData.totalAmount}}万</view>
     </view>
 
     <!-- 缴费最多的一天 -->
@@ -60,7 +60,7 @@
         缴费最多的一天
       </view>
       <view class="card-value">
-        {{formatDate(dashboardData.maxDay.date)}}
+        {{dashboardData.maxDay.formattedDate}}
         <view class="badge badge-success">+{{dashboardData.maxDay.count}}户</view>
       </view>
     </view>
@@ -72,7 +72,7 @@
         缴费最少的一天
       </view>
       <view class="card-value">
-        {{formatDate(dashboardData.minDay.date)}}
+        {{dashboardData.minDay.formattedDate}}
         <view class="badge badge-warning">+{{dashboardData.minDay.count}}户</view>
       </view>
     </view>
@@ -110,9 +110,9 @@
   <view class="data-table">
     <view class="table-title">
       <text>最近缴费记录</text>
-      <view class="view-all" bindtap="viewAllRecords">
+      <!-- <view class="view-all" bindtap="viewAllRecords">
         查看全部 <text class="arrow">›</text>
-      </view>
+      </view> -->
     </view>
     <view class="table-header">
       <view>缴费时间</view>
@@ -121,9 +121,9 @@
     <view wx:for="{{dashboardData.recentPayments}}" wx:key="index" class="table-row">
       <view>
         {{item.date}}
-        <view class="time-badge today" wx:if="{{isToday(item.date)}}">今天</view>
+        <view class="time-badge today" wx:if="{{item.date && item.date.startsWith(today)}}">今天</view>
       </view>
-      <view class="amount">¥{{item.amount.toFixed(0)}}</view>
+      <view class="amount">¥{{item.amount}}</view>
     </view>
   </view>
 </view>

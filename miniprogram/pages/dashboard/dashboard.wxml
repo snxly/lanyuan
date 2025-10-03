@@ -82,9 +82,9 @@
   <view class="chart-container">
     <view class="chart-title">
       <text>缴费总户数趋势</text>
-      <view class="filter-btn">
+      <!-- <view class="filter-btn">
         近90天 <text class="filter-icon">▼</text>
-      </view>
+      </view> -->
     </view>
     <view class="chart-placeholder">
       <text>趋势图区域</text>
@@ -96,9 +96,9 @@
   <view class="chart-container">
     <view class="chart-title">
       <text>每日缴费户数趋势</text>
-      <view class="filter-btn">
+      <!-- <view class="filter-btn">
         近30天 <text class="filter-icon">▼</text>
-      </view>
+      </view> -->
     </view>
     <view class="chart-placeholder">
       <text>趋势图区域</text>

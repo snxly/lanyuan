@@ -79,10 +79,15 @@ function processData(rawData) {
   }
 
   // 按日期分组
-  const paymentsByDate = {};
+  var paymentsByDate = {};
   const paymentAmounts = [];
 
-  rawData.forEach(payment => {
+  // 排序
+  sortedRawData = rawData
+    .sort((a, b) => new Date(a.patTime) - new Date(b.patTime))
+  // console.log(sortedRawData)
+
+  sortedRawData.forEach(payment => {
     const date = payment.patTime.split(' ')[0]; // 获取日期部分
     if (!paymentsByDate[date]) {
       paymentsByDate[date] = {
@@ -102,8 +107,8 @@ function processData(rawData) {
 
   // 计算统计数据
   const dates = Object.keys(paymentsByDate).sort();
-  const totalHouseholds = rawData.length;
-  const totalAmount = Math.floor(rawData.reduce((sum, payment) => sum + parseFloat(payment.payAmt), 0) / 10000);
+  const totalHouseholds = sortedRawData.length;
+  const totalAmount = Math.floor(sortedRawData.reduce((sum, payment) => sum + parseFloat(payment.payAmt), 0) / 10000);
 
   // 计算每日增长（最近一天与前一天的比较）
   let dailyGrowth = 0;
@@ -118,10 +123,10 @@ function processData(rawData) {
   let minDay = { date: '', count: Infinity };
 
   Object.entries(paymentsByDate).forEach(([date, data]) => {
-    if (data.count > maxDay.count) {
+    if (data.count >= maxDay.count) {
       maxDay = { date, count: data.count };
     }
-    if (data.count < minDay.count) {
+    if (data.count <= minDay.count) {
       minDay = { date, count: data.count };
     }
   });
@@ -130,7 +135,7 @@ function processData(rawData) {
   const trendData = [];
   const monthlyData = {};
 
-  rawData.forEach(payment => {
+  sortedRawData.forEach(payment => {
     const month = payment.patTime.substring(0, 7); // YYYY-MM
     if (!monthlyData[month]) {
       monthlyData[month] = 0;

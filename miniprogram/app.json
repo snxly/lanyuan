@@ -4,33 +4,6 @@
     "pages/records/records",
     "pages/profile/profile"
   ],
-  "tabBar": {
-    "custom": true,
-    "color": "#999",
-    "selectedColor": "#07c160",
-    "backgroundColor": "#ffffff",
-    "borderStyle": "black",
-    "list": [
-      {
-        "pagePath": "pages/dashboard/dashboard",
-        "text": "数据",
-        "iconPath": "images/tab-chart.png",
-        "selectedIconPath": "images/tab-chart-active.png"
-      },
-      {
-        "pagePath": "pages/records/records",
-        "text": "记录",
-        "iconPath": "images/tab-list.png",
-        "selectedIconPath": "images/tab-list-active.png"
-      },
-      {
-        "pagePath": "pages/profile/profile",
-        "text": "我的",
-        "iconPath": "images/tab-user.png",
-        "selectedIconPath": "images/tab-user-active.png"
-      }
-    ]
-  },
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#07c160",

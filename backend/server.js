@@ -199,7 +199,7 @@ function processData(rawData) {
     recentPayments,
     progressPercent,
     dailyGrowthPercent,
-    lastUpdate: new Date().toISOString()
+    lastUpdate: new Date().toLocaleString()
   };
 }
 

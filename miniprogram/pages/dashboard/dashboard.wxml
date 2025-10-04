@@ -87,7 +87,7 @@
       </view> -->
     </view>
     <view class="chart-placeholder">
-      <canvas canvas-id="trend" id="trend" class="charts" bindtouchend="tap"/>
+      <canvas canvas-id="trend" id="trend" class="charts" bindtouchstart="scrollStart" bindtouchmove="scroll" bindtouchend="scrollEnd"/>
     </view>
     <!-- <view class="chart-placeholder">
       <text>趋势图区域</text>
@@ -108,7 +108,7 @@
       <text class="chart-hint">(微信小程序中可使用echarts-for-weixin组件)</text>
     </view> -->
     <view class="chart-placeholder">
-      <canvas canvas-id="daily" id="daily" class="charts" bindtouchend="tap"/>
+      <canvas canvas-id="daily" id="daily" class="charts" bindtouchstart="scrollStart" bindtouchmove="scroll" bindtouchend="scrollEnd"/>
     </view>
   </view>
 

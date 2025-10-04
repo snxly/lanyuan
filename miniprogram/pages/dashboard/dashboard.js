@@ -88,19 +88,6 @@ Page({
   },
 
   drawCharts(id, type, data){
-    // const data = {
-    //   categories: ["2016","2017","2018","2019","2020","2021"],
-    //   series: [
-    //     {
-    //       name: "目标值",
-    //       data: [35,36,31,33,13,34]
-    //     },
-    //     // {
-    //     //   name: "完成量",
-    //     //   data: [18,27,21,24,6,28]
-    //     // }
-    //   ]
-    // };
     const ctx = wx.createCanvasContext(id, this);
     uChartsInstance[id] = new uCharts({
         type,
@@ -109,9 +96,7 @@ Page({
         height: 350 / 750 * wx.getWindowInfo().windowWidth,
         categories: data.dates,
         series: data.counts,
-        // animation: true,
         background: "#FFFFFF",
-        // top, right, bottom, left
         padding: [15,15,0,5],
         enableScroll: true,
         xAxis: {
@@ -141,5 +126,26 @@ Page({
           }
         }
       });
+  },
+
+  scrollStart(e) {
+    const id = e.currentTarget.id;
+    if (uChartsInstance[id]) {
+      uChartsInstance[id].scrollStart(e);
+    }
+  },
+
+  scroll(e) {
+    const id = e.currentTarget.id;
+    if (uChartsInstance[id]) {
+      uChartsInstance[id].scroll(e);
+    }
+  },
+
+  scrollEnd(e) {
+    const id = e.currentTarget.id;
+    if (uChartsInstance[id]) {
+      uChartsInstance[id].scrollEnd(e);
+    }
   },
 })

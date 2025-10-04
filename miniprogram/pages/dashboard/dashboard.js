@@ -48,19 +48,18 @@ Page({
             })
             const dailyData = res.data.data.dailyData
             const {dates, dailyCounts, trendCounts} = dailyData
-            const size = 6
             const totalTrendData = {
-              dates: dates.slice(0, size),
+              dates: dates,
               counts: [{
                 name: '2024',
-                data: trendCounts.slice(0,size),
+                data: trendCounts,
               }]
             }
             const dailyTrendData = {
-              dates: dates.slice(0, size),
+              dates: dates,
               counts: [{
                 name: '2024',
-                data: dailyCounts.slice(0,size),
+                data: dailyCounts,
               }]
             }
             this.drawCharts('trend', 'line', totalTrendData)
@@ -110,13 +109,20 @@ Page({
         height: 350 / 750 * wx.getWindowInfo().windowWidth,
         categories: data.dates,
         series: data.counts,
-        animation: true,
+        // animation: true,
         background: "#FFFFFF",
         // top, right, bottom, left
         padding: [15,15,0,5],
-        enableScroll: false,
+        enableScroll: true,
         xAxis: {
-          disableGrid: true
+          itemCount: 8,
+          rotateLabel: true,
+          rotateAngle: 40,
+          scrollShow: true,
+          disableGrid: true,
+          formatter: function(value){
+            return value.slice(5)
+          }
         },
         yAxis: {
           data: [{min: 0}]

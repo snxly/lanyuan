@@ -47,6 +47,7 @@ Page({
               loading: false
             })
             this.drawCharts('trend')
+            this.drawCharts('daily')
           }
           resolve()
         },
@@ -86,15 +87,16 @@ Page({
     };
     const ctx = wx.createCanvasContext(id, this);
     uChartsInstance[id] = new uCharts({
-        type: "column",
+        type: "line",
         context: ctx,
-        width: 750 / 750 * wx.getSystemInfoSync().windowWidth,
-        height: 500 / 750 * wx.getSystemInfoSync().windowWidth,
+        width: 600 / 750 * wx.getWindowInfo().windowWidth,
+        height: 350 / 750 * wx.getWindowInfo().windowWidth,
         categories: data.categories,
         series: data.series,
         animation: true,
         background: "#FFFFFF",
-        padding: [15,15,0,5],
+        // top, right, bottom, left
+        padding: [5,15,25,5],
         xAxis: {
           disableGrid: true
         },
@@ -102,8 +104,10 @@ Page({
           data: [{min: 0}]
         },
         extra: {
-          column: {
-            type: "group"
+          line: {
+            type: "straight",
+            width: 2,
+            activeType: "hollow"
           }
         }
       });

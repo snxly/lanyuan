@@ -131,39 +131,20 @@ function processData(rawData) {
     }
   });
 
-  // 生成趋势数据（按月）
-  const trendData = [];
-  // const monthlyData = {};
+  // 生成每日数据
+  const dailyData = {
+    dates: [],
+    dailyCounts: [],
+    trendCounts: [],
+  };
 
-  // sortedRawData.forEach(payment => {
-  //   const month = payment.patTime.substring(0, 7); // YYYY-MM
-  //   if (!monthlyData[month]) {
-  //     monthlyData[month] = 0;
-  //   }
-  //   monthlyData[month]++;
-  // });
-
-  // Object.keys(monthlyData).sort().forEach(month => {
-  //   trendData.push({
-  //     month,
-  //     count: monthlyData[month]
-  //   });
-  // });
-
-  // 生成每日数据（最近30天）
-  const dailyData = [];
-  // const recentDates = dates.slice(-30);
-  var tendCount = 0;
+  var trendCount = 0;
   dates.forEach(date => {
-    tendCount += paymentsByDate[date].count
-    dailyData.push({
-      date,
-      count: paymentsByDate[date].count
-    });
-    trendData.push({
-      date,
-      count: tendCount
-    });
+    dailyCount = paymentsByDate[date].count
+    trendCount += dailyCount
+    dailyData.dates.push(date);
+    dailyData.dailyCounts.push(dailyCount)
+    dailyData.trendCounts.push(trendCount)
   });
 
   // 最近缴费记录
@@ -200,7 +181,6 @@ function processData(rawData) {
       ...minDay,
       formattedDate: formatDate(minDay.date)
     },
-    trendData,
     dailyData,
     recentPayments,
     progressPercent,

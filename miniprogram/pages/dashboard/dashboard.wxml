@@ -86,10 +86,13 @@
         近90天 <text class="filter-icon">▼</text>
       </view> -->
     </view>
-    <view class="chart-placeholder">
+    <view class="charts">
+      <canvas canvas-id="trend" id="trend" class="charts" bindtouchend="tap"/>
+    </view>
+    <!-- <view class="chart-placeholder">
       <text>趋势图区域</text>
       <text class="chart-hint">(微信小程序中可使用echarts-for-weixin组件)</text>
-    </view>
+    </view> -->
   </view>
 
   <!-- 趋势图2 -->

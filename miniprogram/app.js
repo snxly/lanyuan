@@ -5,6 +5,6 @@ App({
   },
 
   globalData: {
-    apiBaseUrl: 'http://localhost:3000/api' // 后端API地址
+    apiBaseUrl: 'http://192.168.46.72:3000/api' // 后端API地址
   }
 })

@@ -47,8 +47,8 @@
     "disableSWC": true
   },
   "compileType": "miniprogram",
-  "libVersion": "2.19.4",
-  "appid": "wx0afcbb63b20a6b71",
+  "libVersion": "3.10.2",
+  "appid": "wx445b86f754a1e041",
   "projectname": "lanyuan-miniprogram",
   "isGameTourist": false,
   "simulatorType": "wechat",
@@ -79,5 +79,6 @@
       "list": []
     }
   },
-  "editorSetting": {}
+  "editorSetting": {},
+  "cloudfunctionTemplateRoot": "cloudfunctionTemplate/"
 }

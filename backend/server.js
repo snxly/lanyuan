@@ -133,30 +133,36 @@ function processData(rawData) {
 
   // 生成趋势数据（按月）
   const trendData = [];
-  const monthlyData = {};
+  // const monthlyData = {};
 
-  sortedRawData.forEach(payment => {
-    const month = payment.patTime.substring(0, 7); // YYYY-MM
-    if (!monthlyData[month]) {
-      monthlyData[month] = 0;
-    }
-    monthlyData[month]++;
-  });
+  // sortedRawData.forEach(payment => {
+  //   const month = payment.patTime.substring(0, 7); // YYYY-MM
+  //   if (!monthlyData[month]) {
+  //     monthlyData[month] = 0;
+  //   }
+  //   monthlyData[month]++;
+  // });
 
-  Object.keys(monthlyData).sort().forEach(month => {
-    trendData.push({
-      month,
-      count: monthlyData[month]
-    });
-  });
+  // Object.keys(monthlyData).sort().forEach(month => {
+  //   trendData.push({
+  //     month,
+  //     count: monthlyData[month]
+  //   });
+  // });
 
   // 生成每日数据（最近30天）
   const dailyData = [];
-  const recentDates = dates.slice(-30);
-  recentDates.forEach(date => {
+  // const recentDates = dates.slice(-30);
+  var tendCount = 0;
+  dates.forEach(date => {
+    tendCount += paymentsByDate[date].count
     dailyData.push({
       date,
       count: paymentsByDate[date].count
+    });
+    trendData.push({
+      date,
+      count: tendCount
     });
   });
 

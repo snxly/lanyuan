@@ -10,7 +10,7 @@
       <view class="user-name">
         {{hasUserInfo ? userInfo.nickName : '未登录用户'}}
       </view>
-      <view class="user-desc">蓝苑小区居民</view>
+      <view class="user-desc">兰园小区居民</view>
     </view>
     <button wx:if="{{!hasUserInfo}}" class="login-btn" bindtap="getUserProfile">
       登录
@@ -47,6 +47,6 @@
   <!-- 应用信息 -->
   <view class="app-info">
     <text class="app-version">版本 v1.0.0</text>
-    <text class="app-copyright">© 2023 蓝苑小区</text>
+    <text class="app-copyright">© 2023 兰园小区</text>
   </view>
 </view>

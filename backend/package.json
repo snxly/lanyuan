@@ -1,7 +1,7 @@
 {
   "name": "lanyuan-backend",
   "version": "1.0.0",
-  "description": "蓝苑小区供暖缴费数据后端服务",
+  "description": "兰园小区供暖缴费数据后端服务",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

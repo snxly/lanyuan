@@ -175,7 +175,7 @@
 }
 
 .chart-placeholder {
-  height: 500rpx;
+  height: 300px;
   background: #f9f9f9;
   border-radius: 12rpx;
   display: flex;
@@ -184,6 +184,11 @@
   align-items: center;
   color: #999;
   font-size: 28rpx;
+}
+
+.charts {
+  width: 100%;
+  height: 100%;
 }
 
 .chart-hint {

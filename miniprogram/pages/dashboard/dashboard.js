@@ -92,8 +92,8 @@ Page({
     uChartsInstance[id] = new uCharts({
         type,
         context: ctx,
-        width: 600 / 750 * wx.getWindowInfo().windowWidth,
-        height: 350 / 750 * wx.getWindowInfo().windowWidth,
+        width: wx.getWindowInfo().windowWidth - 40,
+        height: 300,
         categories: data.dates,
         series: data.counts,
         background: "#FFFFFF",

@@ -3,7 +3,7 @@
   <!-- 页面头部 -->
   <view class="header">
     <view class="header-title">供暖缴费数据看板</view>
-    <view class="header-subtitle">实时监控缴费进度与趋势</view>
+    <view class="header-subtitle">数据更新时间： {{dashboardData.lastUpdate}}</view>
   </view>
 
   <!-- 加载状态 -->

@@ -72,6 +72,19 @@ async function fetchPaymentData() {
   }
 }
 
+function formatDateToUTC8(date = new Date()) {
+  return date.toLocaleString('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  }).replace(/\//g, '-');
+}
+
 // 处理数据函数
 function processData(rawData) {
   if (!rawData || rawData.length === 0) {
@@ -185,7 +198,7 @@ function processData(rawData) {
     recentPayments,
     progressPercent,
     dailyGrowthPercent,
-    lastUpdate: new Date().toLocaleString()
+    lastUpdate: formatDateToUTC8(),
   };
 }
 

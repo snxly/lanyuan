@@ -48,17 +48,11 @@ Page({
           const {dates, dailyCounts, trendCounts} = dailyData
           const totalTrendData = {
             dates: dates,
-            counts: [{
-              name: '2024',
-              data: trendCounts,
-            }]
+            counts: trendCounts,
           }
           const dailyTrendData = {
             dates: dates,
-            counts: [{
-              name: '2024',
-              data: dailyCounts,
-            }]
+            counts: dailyCounts,
           }
           this.drawCharts('trend', 'line', totalTrendData)
           this.drawCharts('daily', 'column', dailyTrendData)
@@ -76,14 +70,12 @@ Page({
       }
       const testMode = app.globalData.test == true
       if (testMode) {
-        console.log('=== test mode')
         wx.request({
           url: `${app.globalData.apiBaseUrl}/dashboard`,
           success,
           fail,
         })
       } else {
-        console.log('=== prod mode')
         const request = wx.cloud.callContainer({
           "config": {
             "env": "prod-0gmg3xtse9cdc95b"
@@ -132,9 +124,6 @@ Page({
           rotateAngle: 40,
           scrollShow: true,
           disableGrid: true,
-          formatter: function(value){
-            return value.slice(5)
-          }
         },
         yAxis: {
           data: [{min: 0}]
@@ -147,9 +136,9 @@ Page({
           },
           column: {
             type: "group",
-            width: 30,
+            width: 10,
             activeBgColor: "#000000",
-            activeBgOpacity: 0.08
+            activeBgOpacity: 0.08,
           }
         }
       });

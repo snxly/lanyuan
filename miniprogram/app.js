@@ -14,8 +14,8 @@ App({
 
   globalData: {
     // 后端API地址
-    // apiBaseUrl: 'http://192.168.46.72:3000/api' 
-    apiBaseUrl: 'https://lanyuan-backend-190986-4-1381571830.sh.run.tcloudbase.com/api',
+    // apiBaseUrl: 'http://192.168.45.37:3000/api',
+    apiBaseUrl: 'http://localhost:3000/api',
     // todo: 微信如何区分线上环境还是测试环境？
     test: false,
   }

@@ -2,6 +2,8 @@ const express = require('express');
 const cron = require('node-cron');
 const axios = require('axios');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,6 +25,20 @@ let paymentData = {
   recentPayments: [],
   lastUpdate: null
 };
+
+function generateDatesFromOct14ToJan3() {
+  const dates = [];
+  const start = new Date(2024, 9, 14); // 2024年10月14日
+  const end = new Date(2025, 0, 3);    // 2025年1月3日
+  
+  for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      dates.push(`${month}-${day}`);
+  }
+  
+  return dates;
+}
 
 // 获取源数据的函数
 async function fetchPaymentData() {
@@ -101,7 +117,7 @@ function processData(rawData) {
   // console.log(sortedRawData)
 
   sortedRawData.forEach(payment => {
-    const date = payment.patTime.split(' ')[0]; // 获取日期部分
+    const date = payment.patTime.split(' ')[0].slice(5); // 获取日期部分
     if (!paymentsByDate[date]) {
       paymentsByDate[date] = {
         count: 0,
@@ -145,19 +161,28 @@ function processData(rawData) {
   });
 
   // 生成每日数据
+  allDates = generateDatesFromOct14ToJan3()
+  dailyCounts = []
+  trendCounts = []
   const dailyData = {
     dates: [],
-    dailyCounts: [],
-    trendCounts: [],
+    dailyCounts: [{
+      name: '2024',
+      data: dailyCounts,
+    }],
+    trendCounts: [{
+      name: '2024',
+      data: trendCounts,
+    }],
   };
 
   var trendCount = 0;
-  dates.forEach(date => {
-    dailyCount = paymentsByDate[date].count
+  allDates.forEach(date => {
+    dailyCount = paymentsByDate[date]?.count || 0
     trendCount += dailyCount
     dailyData.dates.push(date);
-    dailyData.dailyCounts.push(dailyCount)
-    dailyData.trendCounts.push(trendCount)
+    dailyCounts.push(dailyCount)
+    trendCounts.push(trendCount)
   });
 
   // 最近缴费记录
@@ -176,8 +201,8 @@ function processData(rawData) {
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
     return `${month}.${day}`;
   };
 
@@ -205,18 +230,90 @@ function processData(rawData) {
 // 定时任务 - 每5分钟获取一次数据
 cron.schedule('*/5 * * * *', async () => {
   console.log('开始获取数据...');
+  // const data_2025 = await fetchPaymentData();
+  // paymentData = mergeData(data_2024, data_2025);
   const rawData = await fetchPaymentData();
-  paymentData = processData(rawData);
-  console.log('数据更新完成，当前缴费户数:', paymentData.totalHouseholds);
+  paymentData = processData(rawData)
+  console.log('完成定时任务, 数据更新完成');
 });
 
 // API接口 - 获取处理后的数据
 app.get('/api/dashboard', (req, res) => {
   res.json({
     success: true,
-    data: paymentData
+    data: paymentData,
   });
 });
+
+function removeSomeData(arr) {
+  const removeCount = Math.floor(arr.length / 3);
+  const markedForRemoval = new Set();
+  
+  // 随机选择要删除的索引
+  while (markedForRemoval.size < removeCount) {
+      const randomIndex = Math.floor(Math.random() * arr.length);
+      markedForRemoval.add(randomIndex);
+  }
+  
+  // 过滤掉被标记的元素
+  return arr.filter((_, index) => !markedForRemoval.has(index));
+}
+
+// 从lanyuan-2024.json读取数据的函数
+function read2024Data() {
+  try {
+    const filePath = path.join(__dirname, 'lanyuan-2024.json');
+    if (fs.existsSync(filePath)) {
+      const rawData = fs.readFileSync(filePath, 'utf8');
+      const jsonData = JSON.parse(rawData);
+      console.log('lanyuan-2024.json 读取成功');
+      arr = jsonData.data.showData || []
+      // 测试用，随机删掉 1/3 的数据
+      result = removeSomeData(arr)
+      return result;
+    } else {
+      console.error('lanyuan-2024.json 文件不存在');
+      return [];
+    }
+  } catch (error) {
+    console.error('读取lanyuan-2024.json文件失败:', error.message);
+    return [];
+  }
+}
+
+function mergeData(oldData, newData){
+  return {
+    ...newData,
+    dailyData: {
+      dates: allDates,
+      dailyCounts: [{
+        name: '2024',
+        data: oldData.dailyData.dailyCounts,
+      }, {
+        name: '2025',
+        data: newData.dailyData.dailyCounts.slice(0, 5),
+      }],
+      trendCounts: [{
+        name: '2024',
+        data: oldData.dailyData.trendCounts,
+      }, {
+        name: '2025',
+        data: newData.dailyData.trendCounts.slice(0, 5),
+      }],
+    }
+  }
+}
+
+async function fetchBothData(){
+  const rawData = await fetchPaymentData()
+  if (!rawData || rawData.length === 0) {
+    return paymentData;
+  }
+  data_2024 = processData(read2024Data())
+  data_2025 = processData(rawData);
+  result = mergeData(data_2024, data_2025)
+  return result
+}
 
 // 启动时立即获取一次数据
 setTimeout(() => {

@@ -7,9 +7,10 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#07c160",
-    "navigationBarTitleText": "供暖缴费数据看板",
+    "navigationBarTitleText": "缴费供暖 温暖兰园",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#f7f7f7"
+    "backgroundColor": "#f7f7f7",
+    "enablePullDownRefresh": true
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"

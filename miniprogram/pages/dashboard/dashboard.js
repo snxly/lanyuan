@@ -164,4 +164,13 @@ Page({
       uChartsInstance[id].scrollEnd(e);
     }
   },
+
+  onShareAppMessage() {
+    return {
+      title: '  ',
+      path: '/pages/dashboard/dashboard',
+      imageUrl: '/images/share.png'
+    }
+  },
+
 })

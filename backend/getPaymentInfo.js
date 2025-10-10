@@ -174,6 +174,12 @@ async function getPaymentInfo(roomNumber, retryCount = 3) {
                 timeout: 10000
               }
             );
+
+            // 检查响应码，如果不是200也需要重试
+            if (response.data && response.data.code !== 200) {
+              throw new Error(`API返回错误: ${response.data.message || '未知错误'}`);
+            }
+
             return response.data;
         } catch (error) {
             if (attempt === retryCount) {

@@ -38,7 +38,7 @@ curl 'https://open.lsbankchina.com/jfpt/ent/app/api/app/control/getFixedCosts' \
   -H 'sec-ch-ua: "Chromium";v="128", "Not;A=Brand";v="24", "Google Chrome";v="128"' \
   -H 'sec-ch-ua-mobile: ?0' \
   -H 'sec-ch-ua-platform: "macOS"' \
-  --data-raw '{"merchantNo":"803231049005071","themeId":"bafc86455f0acf87ce34ccde4bee7dbc","fanghao":"6-1-1402","code":"","uuid":""}'
+  --data-raw '{"merchantNo":"803231049005071","themeId":"bafc86455f0acf87ce34ccde4bee7dbc","fanghao":"3-1-302","code":"","uuid":""}'
 ```
 其中 “fanghao” 字段填的就是我们刚生成的 房间号 的信息
 返回结果有两种
@@ -124,4 +124,18 @@ data.type = "0"
 
 
 # 查找csv里每栋楼的房间数
-cat payment_info.csv | awk -F',' 'NR>1 {split($1, a, "-"); buildings[a[1]]++} END {for (b in buildings) print "楼栋 " b ":      " buildings[b] " 个房间"}' | sort -n -k2
+cat payment_info.csv | awk -F',' 'NR>1 {split($1, a, "-"); buildings[a[1]]++} END {for (b in buildings) print "楼栋 " b ":      " buildings[b] " 个房间"}' | sort -n -
+
+
+# 版本
+1. 顺序请求，50个更新一次，大概20+分钟完成一遍
+2. 并行请求，时间压缩到 5分钟 以内
+
+
+# 请求失败房间号
+3-1-302
+4-1-104
+7-1-403
+8-2-103
+16-1-1801
+16-1-1802

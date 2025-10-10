@@ -2,6 +2,7 @@ const fs = require('fs');
 const https = require('https');
 const axios = require('axios');
 const constants = require('constants')
+const { PromisePool } = require('@supercharge/promise-pool');
 
 function generateAllRoomNumbers() {
     const configurations = [
@@ -264,35 +265,54 @@ async function main() {
 
     const results = [];
     const batchSize = 50;
+    const concurrency = 10; // 并发数限制
+    const fileName = 'payment_info_1.csv';
 
     // 初始化CSV文件，写入表头
     const csvHeader = '房间号,缴费状态,建筑面积,客户名称,缴费金额,支付单号,支付时间\n';
-    fs.writeFileSync('payment_info.csv', csvHeader, 'utf8');
+    fs.writeFileSync(fileName, csvHeader, 'utf8');
 
-    for (let i = 0; i < allRoomNumbers.length; i++) {
-        const roomNumber = allRoomNumbers[i];
-        console.log(`正在处理 ${i + 1}/${allRoomNumbers.length}: ${roomNumber}`);
-
-        const result = await getPaymentInfo(roomNumber);
-        const paymentData = extractPaymentData(result, roomNumber);
-        results.push(paymentData);
-
-        // 每处理batchSize个房间，保存一次数据到CSV文件
-        if ((i + 1) % batchSize === 0 || i === allRoomNumbers.length - 1) {
-            const batchResults = results.slice(-batchSize);
-            const csvContent = batchResults.map(item => {
-                return `"${item.roomNumber}","${item.paymentStatus}","${item.buildingArea}","${item.customerName}","${item.paymentAmount}","${item.paymentNo || ''}","${item.paymentTime || ''}"`;
-            }).join('\n') + '\n';
-
-            fs.appendFileSync('payment_info.csv', csvContent, 'utf8');
-            console.log(`已保存第 ${Math.floor(i / batchSize) + 1} 批数据到CSV文件 (${batchResults.length} 条记录)`);
-        }
-
-        // 添加延时，缓解服务器压力
-        await new Promise(resolve => setTimeout(resolve, 50));
+    // 将房间号分批处理
+    const batches = [];
+    for (let i = 0; i < allRoomNumbers.length; i += batchSize) {
+        batches.push(allRoomNumbers.slice(i, i + batchSize));
     }
 
-    console.log('所有缴费信息已保存到 payment_info.csv');
+    console.log(`共 ${batches.length} 批数据，每批 ${batchSize} 个房间`);
+
+    for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+        const batch = batches[batchIndex];
+        console.log(`\n开始处理第 ${batchIndex + 1}/${batches.length} 批数据 (${batch.length} 个房间)`);
+
+        // 使用PromisePool并行处理当前批次
+        const { results: batchResults } = await PromisePool
+            .for(batch)
+            .withConcurrency(concurrency)
+            .process(async (roomNumber, index) => {
+                console.log(`处理 ${batchIndex * batchSize + index + 1}/${allRoomNumbers.length}: ${roomNumber}`);
+                const result = await getPaymentInfo(roomNumber);
+                const paymentData = extractPaymentData(result, roomNumber);
+                return paymentData;
+            });
+
+        // 保存当前批次结果
+        const csvContent = batchResults.map(item => {
+            return `"${item.roomNumber}","${item.paymentStatus}","${item.buildingArea}","${item.customerName}","${item.paymentAmount}","${item.paymentNo || ''}","${item.paymentTime || ''}"`;
+        }).join('\n') + '\n';
+
+        fs.appendFileSync(fileName, csvContent, 'utf8');
+        console.log(`已保存第 ${batchIndex + 1} 批数据到CSV文件 (${batchResults.length} 条记录)`);
+
+        // 将结果添加到总结果中
+        results.push(...batchResults);
+
+        // 批次间延时，缓解服务器压力
+        if (batchIndex < batches.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+    }
+
+    console.log('所有缴费信息已保存到 ', fileName);
 
     // 统计信息
     const paidCount = results.filter(item => item.type === '1').length;

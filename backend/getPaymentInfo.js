@@ -136,47 +136,55 @@ function generateAllRoomNumbers() {
     });
 }
 
-async function getPaymentInfo(roomNumber) {
-    try {
-        const agent = new https.Agent({
-          rejectUnauthorized: false,
-          secureOptions: constants.SSL_OP_LEGACY_SERVER_CONNECT
-        });
-        const response = await axios.post(
-          'https://open.lsbankchina.com/jfpt/ent/app/api/app/control/getFixedCosts',
-          {
-            "merchantNo": "803231049005071",
-            "themeId": "bafc86455f0acf87ce34ccde4bee7dbc",
-            "fanghao": roomNumber,
-            "code": "",
-            "uuid": ""
-          },
-          {
-            headers: {
-              'Accept': 'application/json',
-              'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,en-US;q=0.7,ru;q=0.6,de;q=0.5,fr;q=0.4,es;q=0.3',
-              'Authorization': '',
-              'Connection': 'keep-alive',
-              'Origin': 'https://open.lsbankchina.com',
-              'Referer': 'https://open.lsbankchina.com/jfpt/ent/app/',
-              'Sec-Fetch-Dest': 'empty',
-              'Sec-Fetch-Mode': 'cors',
-              'Sec-Fetch-Site': 'same-origin',
-              'User-Agent': 'Mozilla/5.0 (Linux; U; Android 4.1.2; zh-cn; GT-I9300 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30 MicroMessenger/5.2.380',
-              'b': '1',
-              'content-type': 'application/json;charset=UTF-8',
-              'sec-ch-ua': '""',
-              'sec-ch-ua-mobile': '?1',
-              'sec-ch-ua-platform': '""'
-            },
-            httpsAgent: agent,
-            timeout: 10000
-          }
-        );
-        return response.data;
-    } catch (error) {
-        console.error(`获取房间 ${roomNumber} 缴费信息失败:`, error.message);
-        return null;
+async function getPaymentInfo(roomNumber, retryCount = 3) {
+    for (let attempt = 1; attempt <= retryCount; attempt++) {
+        try {
+            const agent = new https.Agent({
+              rejectUnauthorized: false,
+              secureOptions: constants.SSL_OP_LEGACY_SERVER_CONNECT
+            });
+            const response = await axios.post(
+              'https://open.lsbankchina.com/jfpt/ent/app/api/app/control/getFixedCosts',
+              {
+                "merchantNo": "803231049005071",
+                "themeId": "bafc86455f0acf87ce34ccde4bee7dbc",
+                "fanghao": roomNumber,
+                "code": "",
+                "uuid": ""
+              },
+              {
+                headers: {
+                  'Accept': 'application/json',
+                  'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,en-US;q=0.7,ru;q=0.6,de;q=0.5,fr;q=0.4,es;q=0.3',
+                  'Authorization': '',
+                  'Connection': 'keep-alive',
+                  'Origin': 'https://open.lsbankchina.com',
+                  'Referer': 'https://open.lsbankchina.com/jfpt/ent/app/',
+                  'Sec-Fetch-Dest': 'empty',
+                  'Sec-Fetch-Mode': 'cors',
+                  'Sec-Fetch-Site': 'same-origin',
+                  'User-Agent': 'Mozilla/5.0 (Linux; U; Android 4.1.2; zh-cn; GT-I9300 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30 MicroMessenger/5.2.380',
+                  'b': '1',
+                  'content-type': 'application/json;charset=UTF-8',
+                  'sec-ch-ua': '""',
+                  'sec-ch-ua-mobile': '?1',
+                  'sec-ch-ua-platform': '""'
+                },
+                httpsAgent: agent,
+                timeout: 10000
+              }
+            );
+            return response.data;
+        } catch (error) {
+            if (attempt === retryCount) {
+                console.error(`获取房间 ${roomNumber} 缴费信息失败(第${attempt}次重试):`, error.message);
+                return null;
+            } else {
+                console.warn(`获取房间 ${roomNumber} 缴费信息失败(第${attempt}次重试):`, error.message);
+                // 重试前等待一段时间
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
     }
 }
 
@@ -249,6 +257,11 @@ async function main() {
     console.log(`总房间号数量: ${allRoomNumbers.length}`);
 
     const results = [];
+    const batchSize = 50;
+
+    // 初始化CSV文件，写入表头
+    const csvHeader = '房间号,缴费状态,建筑面积,客户名称,缴费金额,支付单号,支付时间\n';
+    fs.writeFileSync('payment_info.csv', csvHeader, 'utf8');
 
     for (let i = 0; i < allRoomNumbers.length; i++) {
         const roomNumber = allRoomNumbers[i];
@@ -258,20 +271,22 @@ async function main() {
         const paymentData = extractPaymentData(result, roomNumber);
         results.push(paymentData);
 
+        // 每处理batchSize个房间，保存一次数据到CSV文件
+        if ((i + 1) % batchSize === 0 || i === allRoomNumbers.length - 1) {
+            const batchResults = results.slice(-batchSize);
+            const csvContent = batchResults.map(item => {
+                return `"${item.roomNumber}","${item.paymentStatus}","${item.buildingArea}","${item.customerName}","${item.paymentAmount}","${item.paymentNo || ''}","${item.paymentTime || ''}"`;
+            }).join('\n') + '\n';
+
+            fs.appendFileSync('payment_info.csv', csvContent, 'utf8');
+            console.log(`已保存第 ${Math.floor(i / batchSize) + 1} 批数据到CSV文件 (${batchResults.length} 条记录)`);
+        }
+
         // 添加延时，缓解服务器压力
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 50));
     }
 
-    // 生成CSV文件
-    const csvHeader = '房间号,缴费状态,建筑面积,客户名称,缴费金额,支付单号,支付时间\n';
-    const csvContent = results.map(item => {
-        return `"${item.roomNumber}","${item.paymentStatus}","${item.buildingArea}","${item.customerName}","${item.paymentAmount}","${item.paymentNo || ''}","${item.paymentTime || ''}"`;
-    }).join('\n');
-
-    const csvData = csvHeader + csvContent;
-
-    fs.writeFileSync('payment_info.csv', csvData, 'utf8');
-    console.log('缴费信息已保存到 payment_info.csv');
+    console.log('所有缴费信息已保存到 payment_info.csv');
 
     // 统计信息
     const paidCount = results.filter(item => item.type === '1').length;

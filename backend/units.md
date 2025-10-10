@@ -111,3 +111,17 @@ data.type = "0"
     "message": "操作成功"
 }
 ```
+
+
+```
+请求失败 {
+  success: false,
+  code: 500,
+  message: '暂未查询到账单信息,请确认查询信息!',
+  data: null
+}
+```
+
+
+# 查找csv里每栋楼的房间数
+cat payment_info.csv | awk -F',' 'NR>1 {split($1, a, "-"); buildings[a[1]]++} END {for (b in buildings) print "楼栋 " b ":      " buildings[b] " 个房间"}' | sort -n -k2

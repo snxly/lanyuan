@@ -260,13 +260,14 @@ function extractPaymentData(result, roomNumber) {
 }
 
 async function main() {
+    const startTime = Date.now();
     const allRoomNumbers = generateAllRoomNumbers();
     console.log(`总房间号数量: ${allRoomNumbers.length}`);
 
     const results = [];
-    const batchSize = 50;
-    const concurrency = 10; // 并发数限制
-    const fileName = 'payment_info_1.csv';
+    const batchSize = 300;
+    const concurrency = 50; // 并发数限制
+    const fileName = 'payment_info_4.csv';
 
     // 初始化CSV文件，写入表头
     const csvHeader = '房间号,缴费状态,建筑面积,客户名称,缴费金额,支付单号,支付时间\n';
@@ -295,16 +296,21 @@ async function main() {
                 return paymentData;
             });
 
-        // 保存当前批次结果
-        const csvContent = batchResults.map(item => {
+        // 按照allRoomNumbers的顺序重新排序当前批次结果
+        const orderedBatchResults = batch.map(roomNumber => {
+            return batchResults.find(item => item.roomNumber === roomNumber);
+        });
+
+        // 保存当前批次结果（按照allRoomNumbers的顺序）
+        const csvContent = orderedBatchResults.map(item => {
             return `"${item.roomNumber}","${item.paymentStatus}","${item.buildingArea}","${item.customerName}","${item.paymentAmount}","${item.paymentNo || ''}","${item.paymentTime || ''}"`;
         }).join('\n') + '\n';
 
         fs.appendFileSync(fileName, csvContent, 'utf8');
-        console.log(`已保存第 ${batchIndex + 1} 批数据到CSV文件 (${batchResults.length} 条记录)`);
+        console.log(`已保存第 ${batchIndex + 1} 批数据到CSV文件 (${orderedBatchResults.length} 条记录)`);
 
         // 将结果添加到总结果中
-        results.push(...batchResults);
+        results.push(...orderedBatchResults);
 
         // 批次间延时，缓解服务器压力
         if (batchIndex < batches.length - 1) {
@@ -323,6 +329,13 @@ async function main() {
     console.log(`已缴费: ${paidCount}`);
     console.log(`未缴费: ${unpaidCount}`);
     console.log(`请求失败: ${errorCount}`);
+
+    // 计算并输出执行时间
+    const endTime = Date.now();
+    const executionTime = endTime - startTime;
+    const minutes = Math.floor(executionTime / 60000);
+    const seconds = Math.floor((executionTime % 60000) / 1000);
+    console.log(`\n执行时间: ${minutes}分${seconds}秒 (${executionTime}毫秒)`);
 }
 
 // 运行主程序

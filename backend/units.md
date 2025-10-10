@@ -20,6 +20,8 @@
 3. 从返回结果里获取 缴费状态（type），房间号，建筑面积，客户名称等信息，保存成csv格式文件
 4. 一栋楼请求完了以后，保存一次文件
 5. 每个请求中间增加适当延时，缓解服务器压力
+6. 为提高效率，并行发送请求
+7. 按照原始房间号顺序写入csv文件
 ## 请求API
 ```cmd
 curl 'https://open.lsbankchina.com/jfpt/ent/app/api/app/control/getFixedCosts' \
@@ -113,16 +115,6 @@ data.type = "0"
 ```
 
 
-```
-请求失败 {
-  success: false,
-  code: 500,
-  message: '暂未查询到账单信息,请确认查询信息!',
-  data: null
-}
-```
-
-
 # 查找csv里每栋楼的房间数
 cat payment_info.csv | awk -F',' 'NR>1 {split($1, a, "-"); buildings[a[1]]++} END {for (b in buildings) print "楼栋 " b ":      " buildings[b] " 个房间"}' | sort -n -
 
@@ -130,9 +122,14 @@ cat payment_info.csv | awk -F',' 'NR>1 {split($1, a, "-"); buildings[a[1]]++} EN
 # 版本
 1. 顺序请求，50个更新一次，大概20+分钟完成一遍
 2. 并行请求，时间压缩到 5分钟 以内
+3. 顺序写入，提高并发数，2分17秒
+4. 增加写入文件的 batch_size, 1分0秒
 
-
-# 请求失败房间号
+# TODO
+有些房间号每次都失败，所以总是需要重试3次。
+不知道什么原因
+可以尝试删除这些房间号，应该还可以快几秒，不过要注意写入的时候需要包含这些房间号
+## 请求失败房间号
 3-1-302
 4-1-104
 7-1-403

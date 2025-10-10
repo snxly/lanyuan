@@ -18,6 +18,8 @@
 1. 使用接口 generateAllRoomNumbers 获取所有房间号信息
 2. 针对每个房间号，发送如下请求，获取其缴费信息。
 3. 从返回结果里获取 缴费状态（type），房间号，建筑面积，客户名称等信息，保存成csv格式文件
+4. 一栋楼请求完了以后，保存一次文件
+5. 每个请求中间增加适当延时，缓解服务器压力
 ## 请求API
 ```cmd
 curl 'https://open.lsbankchina.com/jfpt/ent/app/api/app/control/getFixedCosts' \

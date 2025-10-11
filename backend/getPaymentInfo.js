@@ -267,7 +267,7 @@ async function main() {
     const results = [];
     const batchSize = 300;
     const concurrency = 50; // 并发数限制
-    const fileName = 'payment_info_4.csv';
+    const fileName = 'payment_info_2025.csv';
 
     // 初始化CSV文件，写入表头
     const csvHeader = '房间号,缴费状态,建筑面积,客户名称,缴费金额,支付单号,支付时间\n';
@@ -314,7 +314,7 @@ async function main() {
 
         // 批次间延时，缓解服务器压力
         if (batchIndex < batches.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
     }
 

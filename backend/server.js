@@ -191,7 +191,7 @@ function processData(rawData) {
     .slice(0, 10);
 
   // 计算进度百分比
-  const targetHouseholds = 606
+  const targetHouseholds = 607
   const progressPercent = Math.min((totalHouseholds / targetHouseholds) * 100, 100).toFixed(1);
 
   // 计算日增长百分比

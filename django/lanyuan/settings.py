@@ -4,7 +4,7 @@ Django settings for lanyuan project.
 
 import os
 from pathlib import Path
-from celery.schedules import crontab
+# 使用schedule库替代Celery
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,7 +33,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'django_celery_beat',
     'api',
 ]
 
@@ -134,15 +133,5 @@ REST_FRAMEWORK = {
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True
 
-# Celery settings
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-CELERY_TIMEZONE = 'Asia/Shanghai'
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-CELERY_BEAT_SCHEDULE = {
-    'fetch-payment-data-every-5-minutes': {
-        'task': 'api.tasks.fetch_and_process_payment_data',
-        'schedule': crontab(minute='*/5'),  # 每5分钟执行一次
-        'options': {'queue': 'default'}
-    },
-}
+# 定时任务设置 - 使用schedule库替代Celery
+# 定时任务在 schedule_tasks.py 中实现

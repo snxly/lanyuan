@@ -6,65 +6,22 @@ import os
 import sys
 import subprocess
 import time
-
-
-def start_redis():
-    """启动Redis服务"""
-    try:
-        # 检查Redis是否已经在运行
-        result = subprocess.run(['redis-cli', 'ping'], capture_output=True, text=True)
-        if result.returncode == 0 and result.stdout.strip() == 'PONG':
-            print('Redis服务已经在运行')
-            return True
-
-        # 尝试启动Redis
-        print('正在启动Redis服务...')
-        subprocess.Popen(['redis-server'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        time.sleep(2)
-
-        # 检查Redis是否启动成功
-        result = subprocess.run(['redis-cli', 'ping'], capture_output=True, text=True)
-        if result.returncode == 0 and result.stdout.strip() == 'PONG':
-            print('Redis服务启动成功')
-            return True
-        else:
-            print('Redis服务启动失败，请确保Redis已安装并配置正确')
-            return False
-
-    except Exception as e:
-        print(f'启动Redis服务时出错: {e}')
-        print('请确保Redis已安装并配置正确')
-        return False
-
-
-def start_celery_worker():
-    """启动Celery Worker"""
-    print('正在启动Celery Worker...')
-    subprocess.Popen([
-        'celery', '-A', 'lanyuan', 'worker',
-        '--loglevel=info',
-        '--concurrency=1'
-    ])
-    time.sleep(2)
-    print('Celery Worker启动完成')
-
-
-def start_celery_beat():
-    """启动Celery Beat"""
-    print('正在启动Celery Beat...')
-    subprocess.Popen([
-        'celery', '-A', 'lanyuan', 'beat',
-        '--loglevel=info',
-        '--scheduler', 'django_celery_beat.schedulers:DatabaseScheduler'
-    ])
-    time.sleep(2)
-    print('Celery Beat启动完成')
+from schedule_tasks import start_schedule_in_background
 
 
 def start_django_server():
     """启动Django开发服务器"""
     print('正在启动Django开发服务器...')
-    os.system('python manage.py runserver 0.0.0.0:8000')
+    # 设置Django环境变量
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'lanyuan.settings')
+
+    # 直接导入并启动Django服务器
+    import django
+    django.setup()
+
+    from django.core.management import execute_from_command_line
+    # 使用use_reloader=False避免文件变化时重新加载导致重复启动
+    execute_from_command_line(['manage.py', 'runserver', '0.0.0.0:8000', '--noreload'])
 
 
 def main():
@@ -78,8 +35,7 @@ def main():
     print('检查依赖...')
     try:
         import django
-        import celery
-        import redis
+        import schedule
         print('依赖检查通过')
     except ImportError as e:
         print(f'依赖检查失败: {e}')
@@ -90,16 +46,14 @@ def main():
     print('执行数据库迁移...')
     os.system('python manage.py migrate')
 
-    # 启动Redis
-    if not start_redis():
-        print('无法启动Redis服务，请手动启动Redis后重新运行此脚本')
-        return
+    # 启动定时任务
+    print('启动定时任务...')
+    start_schedule_in_background()
 
-    # 启动Celery Worker
-    start_celery_worker()
-
-    # 启动Celery Beat
-    start_celery_beat()
+    # 立即执行一次数据更新，确保有初始数据
+    print('执行初始数据更新...')
+    from schedule_tasks import fetch_and_process_payment_data
+    fetch_and_process_payment_data()
 
     # 启动Django服务器
     start_django_server()

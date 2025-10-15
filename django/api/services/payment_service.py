@@ -6,8 +6,12 @@ import json
 import os
 import requests
 import ssl
+import urllib3
 from datetime import datetime, timedelta
 from typing import List, Dict, Any
+
+# 禁用SSL警告
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class PaymentService:
@@ -44,18 +48,15 @@ class PaymentService:
 
         return dates
 
-    async def fetch_payment_data(self) -> List[Dict[str, Any]]:
+    def fetch_payment_data(self) -> List[Dict[str, Any]]:
         """获取缴费数据"""
         try:
-            # 创建自定义SSL上下文
-            ssl_context = ssl.create_default_context()
-            ssl_context.check_hostname = False
-            ssl_context.verify_mode = ssl.CERT_NONE
+            import subprocess
+            import json
 
             headers = {
                 'Accept': 'application/json',
                 'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,en-US;q=0.7,ru;q=0.6,de;q=0.5,fr;q=0.4,es;q=0.3',
-                'Authorization': '',
                 'Connection': 'keep-alive',
                 'Origin': 'https://open.lsbankchina.com',
                 'Referer': 'https://open.lsbankchina.com/jfpt/ent/app/',
@@ -64,7 +65,6 @@ class PaymentService:
                 'Sec-Fetch-Site': 'same-origin',
                 'User-Agent': 'Mozilla/5.0 (Linux; U; Android 4.1.2; zh-cn; GT-I9300 Build/JZO54K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30 MicroMessenger/5.2.380',
                 'b': '1',
-                'content-type': 'application/json;charset=UTF-8',
                 'sec-ch-ua': '""',
                 'sec-ch-ua-mobile': '?1',
                 'sec-ch-ua-platform': '""'
@@ -77,16 +77,28 @@ class PaymentService:
                 "uuid": ""
             }
 
-            response = requests.post(
-                'https://open.lsbankchina.com/jfpt/ent/app/api/app/control/getFixedCosts',
-                json=data,
-                headers=headers,
-                verify=False,
-                timeout=10
-            )
+            # 使用curl作为替代方案，因为Python的SSL库有兼容性问题
+            curl_cmd = [
+                'curl', '-k', '--insecure',
+                '-X', 'POST',
+                '-H', 'Content-Type: application/json',
+                '-H', f'Accept: {headers["Accept"]}',
+                '-H', f'Accept-Language: {headers["Accept-Language"]}',
+                '-H', f'Origin: {headers["Origin"]}',
+                '-H', f'Referer: {headers["Referer"]}',
+                '-H', f'User-Agent: {headers["User-Agent"]}',
+                '--data', json.dumps(data),
+                'https://open.lsbankchina.com/jfpt/ent/app/api/app/control/getFixedCosts'
+            ]
 
-            response_data = response.json()
-            return response_data.get('data', {}).get('showData', [])
+            result = subprocess.run(curl_cmd, capture_output=True, text=True, timeout=30)
+
+            if result.returncode == 0:
+                response_data = json.loads(result.stdout)
+                return response_data.get('data', {}).get('showData', [])
+            else:
+                print(f'curl请求失败: {result.stderr}')
+                return []
 
         except Exception as e:
             print(f'获取数据失败: {e}')
@@ -224,7 +236,7 @@ class PaymentService:
     def read_2024_data(self) -> List[Dict[str, Any]]:
         """读取2024年数据"""
         try:
-            file_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'backend', 'lanyuan-2024.json')
+            file_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'data', 'lanyuan-2024.json')
             if os.path.exists(file_path):
                 with open(file_path, 'r', encoding='utf-8') as f:
                     raw_data = json.load(f)

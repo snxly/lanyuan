@@ -3,7 +3,7 @@ API views for lanyuan project.
 """
 
 from django.http import JsonResponse
-from .services import payment_service
+from .services.payment_service import payment_service
 
 
 def dashboard(request):

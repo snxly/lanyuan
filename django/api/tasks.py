@@ -22,5 +22,5 @@ def fetch_and_process_payment_data():
     # 更新数据
     payment_service.update_payment_data(processed_data)
 
-    print('完成定时任务, 数据更新完成')
+    print('完成定时任务, 数据更新完成1', processed_data)
     return True

@@ -5,7 +5,7 @@ description = "Django service for room payment tracking"
 requires-python = ">=3.8"
 dependencies = [
     "Django>=4.2",
-    "mysqlclient>=2.1",
+    "mysql-connector-python>=8.0",
     "requests>=2.31",
     "APScheduler>=3.10",
     "python-dotenv>=1.0",

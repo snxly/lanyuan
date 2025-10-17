@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-your-secret-key-here')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
+DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
@@ -61,19 +61,32 @@ TEMPLATES = [
 WSGI_APPLICATION = 'payment_service.wsgi.application'
 
 # Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME', 'payment_db'),
-        'USER': os.getenv('DB_USER', 'root'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'Weixin000'),
-        'HOST': os.getenv('DB_HOST', 'sh-cynosdbmysql-grp-a43bwiag.sql.tencentcdb.com'),
-        'PORT': os.getenv('DB_PORT', '27487'),
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-        },
+# 开发环境使用SQLite，生产环境使用MySQL
+if os.getenv('DEBUG', 'False').lower() == 'true' or True:  # 临时使用SQLite测试
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    # 使用mysql-connector-python作为MySQL驱动
+    DATABASES = {
+        'default': {
+            'ENGINE': 'mysql.connector.django',
+            'NAME': os.getenv('DB_NAME', 'lanyuan'),
+            'USER': os.getenv('DB_USER', 'root'),
+            'PASSWORD': os.getenv('DB_PASSWORD', 'Weixin000'),
+            'HOST': os.getenv('DB_HOST', 'sh-cynosdbmysql-grp-a43bwiag.sql.tencentcdb.com'),
+            'PORT': os.getenv('DB_PORT', '27487'),
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'use_pure': True,  # 使用纯Python实现
+                'connect_timeout': 30,  # 增加连接超时
+                'connection_timeout': 30,
+            },
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

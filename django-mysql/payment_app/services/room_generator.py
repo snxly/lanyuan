@@ -17,43 +17,49 @@ class RoomNumberGenerator:
                 'floors': 4,
                 'units': [1, 2],
                 'buildings': ['27', '28', '29', '30', '31', '32'],
-                'rooms_per_unit': [1, 2, 3, 4]
+                'rooms_per_unit': [1, 2],  # 1单元：1,2结尾；2单元：3,4结尾
+                'unit_room_mapping': {1: [1, 2], 2: [3, 4]}
             },
             # 情况2: 6层，1/2结尾是1单元，3/4结尾是2单元
             {
                 'floors': 6,
                 'units': [1, 2],
                 'buildings': ['26'],
-                'rooms_per_unit': [1, 2, 3, 4]
+                'rooms_per_unit': [1, 2],
+                'unit_room_mapping': {1: [1, 2], 2: [3, 4]}
             },
             # 情况3: 7层，1/2结尾是1单元，3/4结尾是2单元
             {
                 'floors': 7,
                 'units': [1, 2],
                 'buildings': ['20', '21', '22', '23', '24', '25'],
-                'rooms_per_unit': [1, 2, 3, 4]
+                'rooms_per_unit': [1, 2],
+                'unit_room_mapping': {1: [1, 2], 2: [3, 4]}
             },
-            # 情况4: 11层，1/2结尾是1单元，3/4结尾是2单元（特殊处理4号楼）
+            # 情况4: 11层，1/2结尾是1单元，3/4结尾是2单元
             {
                 'floors': 11,
                 'units': [1, 2],
                 'buildings': ['3'],
-                'rooms_per_unit': [1, 2, 3, 4],
-                'exclude_rooms': ['101', '102', '103', '201']
+                'rooms_per_unit': [1, 2],
+                'unit_room_mapping': {1: [1, 2], 2: [3, 4]}
             },
             # 情况5: 18层，1/2结尾是1单元，3/4结尾是2单元
             {
                 'floors': 18,
                 'units': [1, 2],
                 'buildings': ['1', '2', '8', '12', '13', '15', '18'],
-                'rooms_per_unit': [1, 2, 3, 4]
+                'rooms_per_unit': [1, 2],
+                'unit_room_mapping': {1: [1, 2], 2: [3, 4]}
             },
             # 情况6: 18层，都是1单元，有1/2/3/4四户
             {
                 'floors': 18,
                 'units': [1],
                 'buildings': ['4', '5', '6', '7', '11', '14'],
-                'rooms_per_unit': [1, 2, 3, 4]
+                'rooms_per_unit': [1, 2, 3, 4],
+                'exclude_rooms': ['101', '102', '103', '201'],  # 仅4号楼排除
+                'unit_room_mapping': None
             },
             # 情况7: 18层，都是1单元，只有1/2两户
             {
@@ -67,7 +73,8 @@ class RoomNumberGenerator:
                 'floors': 18,
                 'units': [1, 2, 3],
                 'buildings': ['19'],
-                'rooms_per_unit': [1, 2, 3, 4, 5, 6]
+                'rooms_per_unit': [1, 2],
+                'unit_room_mapping': {1: [1, 2], 2: [3, 4], 3: [5, 6]}
             }
         ]
 
@@ -84,15 +91,25 @@ class RoomNumberGenerator:
             buildings = config['buildings']
             rooms_per_unit = config['rooms_per_unit']
             exclude_rooms = config.get('exclude_rooms', [])
+            unit_room_mapping = config.get('unit_room_mapping', None)
 
             for building in buildings:
+                # 特殊处理：4号楼排除的房间
+                building_exclude_rooms = exclude_rooms if building == '4' else []
+
                 for floor in range(1, floors + 1):
                     for unit in units:
-                        for room in rooms_per_unit:
+                        # 如果有单元房间映射，使用映射；否则使用通用逻辑
+                        if unit_room_mapping:
+                            unit_rooms = unit_room_mapping.get(unit, rooms_per_unit)
+                        else:
+                            unit_rooms = rooms_per_unit
+
+                        for room in unit_rooms:
                             room_number = f"{floor:02d}{room:02d}"
 
                             # 检查是否在排除列表中
-                            if room_number in exclude_rooms:
+                            if room_number in building_exclude_rooms:
                                 continue
 
                             full_room = f"{building}-{unit}-{room_number}"

@@ -13,7 +13,6 @@
 1.2 数据库信息： 
     地址：sh-cynosdbmysql-grp-a43bwiag.sql.tencentcdb.com:27487
     用户：root
-    密码：Weixin000
 2.  数据库schema可参考 @../data/sql/*_info_table.sql。
 2.1 改动需求：room_info里面的客户名称是比较敏感的信息，另外常见一张表（客户信息），把”客户名称“挪过去。以后客户信息这张表里可能还会有其他信息。需要提供对应sql。
 3.  /api/dashboard 接口示例如下，字段的意思分别是

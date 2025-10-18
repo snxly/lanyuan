@@ -36,7 +36,7 @@ DATABASES = {
         'ENGINE': 'mysql.connector.django',
         'NAME': os.getenv('DB_NAME', 'lanyuan'),
         'USER': os.getenv('DB_USER', 'root'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'Weixin000'),
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
         'HOST': os.getenv('DB_HOST', 'sh-cynosdbmysql-grp-a43bwiag.sql.tencentcdb.com'),
         'PORT': os.getenv('DB_PORT', '27487'),
         'OPTIONS': {
@@ -87,7 +87,7 @@ ALLOWED_HOSTS=your-domain.com
 # 数据库配置
 DB_NAME=lanyuan
 DB_USER=root
-DB_PASSWORD=Weixin000
+DB_PASSWORD=
 DB_HOST=sh-cynosdbmysql-grp-a43bwiag.sql.tencentcdb.com
 DB_PORT=27487
 
